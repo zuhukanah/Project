@@ -45,7 +45,6 @@ def delete_stock(stock_list):
         print("Could not find stock with symbol '{}'".format(symbol))
     _ = input("Press Enter to continue ***")
     
-    
 # List stocks being tracked
 def list_stocks(stock_list):
     print("Stock List ----")
@@ -56,7 +55,7 @@ def list_stocks(stock_list):
     print("")
     _ = input("End of list, press Enter to continue. ***")
     
-    # Add Daily Stock Data
+# Add Daily Stock Data
 def add_stock_data(stock_list):
     print("Add Daily Stock Data ----")
     print("Stock List: [",end="")
@@ -87,10 +86,7 @@ def add_stock_data(stock_list):
         print("Symbol Not Found ***")
     _ = input("Press Enter to Continue ***")
 
-
-    
-
-    
+#Create Investment Account
 def investment_type(stock_list):
     print("Investment Account ---")
     balance = float(input("What is your initial balance: "))
@@ -127,19 +123,44 @@ def investment_type(stock_list):
                 print("Symbol Not Found ***")
         trad_acct.add_stock(temp_list)
 
-
 # Function to create stock chart
 def display_stock_chart(stock_list,symbol):
-    print("This method is under construction")
+    date = []
+    price = []
+    volume = []
+    company =  ""
+    for stock in stock_list:
+        if stock.symbol == symbol:
+            company = stock.name
+            for dailyData in stock.DataList:
+                date.append(dailyData.date)
+                price.append(dailyData.close)
+                volume.append(dailyData.volume)
+    plt.plot(date, price)
+    plt.xlabel(date)
+    plt.ylabel(price)
+    plt.title(company)
+    plt.show()
 
 # Display Chart
 def display_chart(stock_list):
-    print("This method is under construction")
-  
+    print("Stock List: [", end= "")
+    for stock in stock_list:
+        print(stock.symbol," ",end="")
+    print("]")
+    symbol = input("Please choose which stock to query: ").upper()
+    found = False
+    for stock in stock_list:
+        if stock.symbol == symbol:
+            found = True
+            current_stock = stock
+    if found == True:
+        display_stock_chart(stock_list, symbol)
+    else:
+        print("Invalid Stock Symbol!")
+    _= input("Press enter to continue...")
 
-    
 #object encoder and decoder pasted here
-
 def file_processing(stock_list):
     print("This method is under construction")
   
