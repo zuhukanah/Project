@@ -1,0 +1,39 @@
+{
+    "Stock": [
+        {
+            "symbol": "TST",
+            "name": "Test",
+            "shares": 100.0,
+            "DataList": [
+                {
+                    "date": "8/28/20",
+                    "close": 47.85,
+                    "volume": 10550.0
+                },
+                {
+                    "date": "8/31/20",
+                    "close": 47.91,
+                    "volume": 10750.0
+                }
+            ]
+        },
+        {
+            "symbol": "PLC",
+            "name": "Placeholder",
+            "shares": 200.0,
+            "DataList": [
+                {
+                    "date": "8/28/20",
+                    "close": 59.5,
+                    "volume": 11510.0
+                }
+            ]
+        },
+        {
+            "symbol": "GME",
+            "name": "GameStop Corp.",
+            "shares": 60.0,
+            "DataList": []
+        }
+    ]
+}

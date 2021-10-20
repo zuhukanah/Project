@@ -160,20 +160,142 @@ def display_chart(stock_list):
         print("Invalid Stock Symbol!")
     _= input("Press enter to continue...")
 
-#object encoder and decoder pasted here
+def data_encoder(obj):
+    data_dict = dict(date=obj.date, close = obj.close, volume = obj.volume)
+    return data_dict
+
+def obj_encoder(obj):
+        dlist = []
+        for o in obj.DataList:
+            d = data_encoder(o)
+            dlist.append(d)
+        stock_dict = dict(symbol=obj.symbol, name = obj.name, shares = obj.shares, DataList = dlist)
+        return stock_dict
+
+def obj_decoder(obj):
+        symbol = obj["symbol"]
+        name = obj["name"]
+        shares = obj["shares"]
+        DL = obj["DataList"]
+        objStock = Stock(symbol, name, shares)
+        for o in DL:
+            d = o['date']
+            c = o['close']
+            v = o['volume']
+            dd = DailyData(d,c,v)
+            objStock.add_data(dd)
+        return objStock
+
 def file_processing(stock_list):
-    print("This method is under construction")
+    json_dict = {}
+    choice = ""
+    while choice != "E":
+        choice = input("Please enter S to save data, L to load data, D to import data, or E to exit: ").upper()
+        if choice == "S":
+            json_list = [obj_encoder(stock) for stock in stock_list]
+            json_dict["Stock"] = json_list
+            try:
+                f = open("stock_data.json", "w")
+                json.dump(json_dict, f, indent=4)
+                print("File saved successfuly.")
+            except IOError:
+                print("Error: unable to save file")
+                break
+        if choice == "L":
+            try:
+                f = open("stock_data.json", "r")
+                str_file = f.read()
+                str_file = str_file.replace("\'","\"")
+                stock_obj = json.loads(str_file)
+                for s in stock_obj["Stock"]:
+                    temp = obj_decoder(s)
+                    stock_list.append(temp)
+                print("File loaded successfuly")
+            except IOError:
+                print("Error: Unable to load file.")
+                break
+        if choice == "D":
+            print("Historical data will be imported...")
+            symbol = input("Please enter stock symbol: ").upper()
+            filename = input("Enter the csv filename: ")
+            import_stock_csv(stock_list, symbol, filename) #to be implemented later
+            display_report(stock_list, symbol) #to be implemented later
+
+
   
       # Get price and volume history from Yahoo! Finance using CSV import.
 
                 
  # Get price and volume history from Yahoo! Finance using CSV import.
 def import_stock_csv(stock_list,symbol,filename):
-    print("This method is under construction")
+        for stock in stock_list:
+            if stock.symbol == symbol:
+                with open(filename, newline='') as stockdata:
+                    datareader = csv.reader(stockdata,delimiter=',')
+                    next(datareader)
+                    for row in datareader:
+                        daily_data = DailyData(str(row[0]),float(row[4]),float(row[6]))
+                        stock.add_data(daily_data)
+
     
    # Display Report for All Stocks
-def display_report(stock_list):
-    print("This method is under construction")
+def display_report(stock_list, symbol):
+    currentDate=datetime.now()
+    print("Stock Report ---")
+    for stock in stock_list:
+        if stock.symbol == symbol:
+            print("Report for: ",stock.symbol,stock.name)
+            print("Shares: ", stock.shares)
+            count = 0
+            price_total = 0.00
+            volume_total = 0
+            lowPrice = 999999.99
+            highPrice = 0.00
+            lowVolume = 999999999999
+            highVolume = 0
+            startDate = datetime.strptime("12/31/2099","%m/%d/%Y")
+            endDate = datetime.strptime("1/1/1900","%m/%d/%Y")
+           
+            for daily_data in stock.DataList: 
+                currentDate= datetime.strptime(daily_data.date,"%Y-%m-%d")
+                count = count + 1
+                price_total = price_total + daily_data.close
+                volume_total = volume_total + daily_data.volume
+                if daily_data.close < lowPrice:
+                    lowPrice = daily_data.close
+                if daily_data.close > highPrice:
+                    highPrice = daily_data.close
+                if daily_data.volume < lowVolume:
+                    lowVolume = daily_data.volume
+                if daily_data.volume > highVolume:
+                    highVolume = daily_data.volume
+                if currentDate < startDate:
+                    startDate = currentDate
+                    startPrice = daily_data.close
+                if currentDate > endDate:
+                    endDate = currentDate
+                    endPrice = daily_data.close
+                priceChange = endPrice-startPrice
+                print(daily_data.date,daily_data.close,daily_data.volume)
+            if count > 0:
+                print("Summary ---",startDate,"to",endDate)
+                print("Low Price:", "${:,.2f}".format(lowPrice))
+                print("High Price:", "${:,.2f}".format(highPrice))
+                print("Average Price:", "${:,.2f}".format(price_total/count))
+                print("Low Volume:", lowVolume)
+                print("High Volume:", highVolume)
+                print("Average Volume:", "${:,.2f}".format(volume_total/count))
+                print("Starting Price:", "${:,.2f}".format(startPrice))
+                print("Ending Price:", "${:,.2f}".format(endPrice))
+                print("Change in Price:", "${:,.2f}".format(priceChange))
+                print("Profit/Loss","${:,.2f}".format(priceChange * stock.shares))
+            else:
+                print("*** No daily history.")
+            print("\n\n\n")
+    print("--- Report Complete ---")
+    _ = input("Press Enter to Continue")
+    
+
     
 def main_menu(stock_list):
     option = ""
