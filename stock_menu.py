@@ -195,21 +195,21 @@ def file_processing(stock_list):
             json_list = [obj_encoder(stock) for stock in stock_list]
             json_dict["Stock"] = json_list
             try:
-                f = open("stock_data.json", "w")
-                json.dump(json_dict, f, indent=4)
+                with open("stock_data.json", "w") as f:
+                    json.dump(json_dict, f, indent=4)
                 print("File saved successfuly.")
             except IOError:
                 print("Error: unable to save file")
                 break
         if choice == "L":
             try:
-                f = open("stock_data.json", "r")
-                str_file = f.read()
-                str_file = str_file.replace("\'","\"")
-                stock_obj = json.loads(str_file)
-                for s in stock_obj["Stock"]:
-                    temp = obj_decoder(s)
-                    stock_list.append(temp)
+                with open("stock_data.json", "r") as f:
+                    str_file = f.read()
+                    str_file = str_file.replace("\'","\"")
+                    stock_obj = json.loads(str_file)
+                    for s in stock_obj["Stock"]:
+                        temp = obj_decoder(s)
+                        stock_list.append(temp)
                 print("File loaded successfuly")
             except IOError:
                 print("Error: Unable to load file.")
@@ -221,12 +221,7 @@ def file_processing(stock_list):
             import_stock_csv(stock_list, symbol, filename) #to be implemented later
             display_report(stock_list, symbol) #to be implemented later
 
-
-  
-      # Get price and volume history from Yahoo! Finance using CSV import.
-
-                
- # Get price and volume history from Yahoo! Finance using CSV import.
+# Get price and volume history from Yahoo! Finance using CSV import.
 def import_stock_csv(stock_list,symbol,filename):
         for stock in stock_list:
             if stock.symbol == symbol:
@@ -238,7 +233,7 @@ def import_stock_csv(stock_list,symbol,filename):
                         stock.add_data(daily_data)
 
     
-   # Display Report for All Stocks
+    # Display Report for All Stocks
 def display_report(stock_list, symbol):
     currentDate=datetime.now()
     print("Stock Report ---")
